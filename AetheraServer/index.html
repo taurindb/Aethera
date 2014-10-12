@@ -1,0 +1,193 @@
+
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="description" content="$1">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Aethera</title>
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" type="text/css" href="css/weather-icons.min.css">
+		<link rel="stylesheet" type="text/css" href="css/animate.css">
+		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>		
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+        <script type="text/javascript">
+	        
+        	function loadData(){  
+
+				var getFile = {
+					
+					fileContents:"NULL",
+
+					init: function(){
+
+						$.ajax({
+							url: "Node1latest.txt",
+							async: false,
+							success: function (data){
+								getFile.fileContents = data;
+							}
+						});
+					}
+				};
+
+				getFile.init();
+
+				var line = getFile.fileContents;
+
+				var lineArray = line.split(",");
+				
+				document.getElementById("Date").innerHTML = lineArray[0];
+				document.getElementById("Sound").innerHTML = lineArray[1];
+				document.getElementById("VisibleLight").innerHTML = lineArray[2];
+				document.getElementById("AirQuality").innerHTML = lineArray[3];
+				document.getElementById("Temperature").innerHTML = lineArray[4];
+				document.getElementById("Humidity").innerHTML = lineArray[5];
+				document.getElementById("HeatIndex").innerHTML = lineArray[6];
+				document.getElementById("UVIndex").innerHTML = lineArray[7];
+				document.getElementById("BarometricPressure").innerHTML = lineArray[8];
+				document.getElementById("ParticulateMatter").innerHTML = lineArray[9];
+				document.getElementById("ParticulateDensity").innerHTML = lineArray[10];
+
+			}
+
+	        $(document).ready(function(){
+				loadData();
+				setInterval(loadData,61500);
+			});
+     
+        </script>
+
+
+    </head>
+    <body>
+		
+			<div class="container">
+				<div class="row header">
+
+				<div class="col-md-4 colm"></div>				
+				<div class="col-md-4 colm animated fadeInDownBig"><h1><span class="glyphicon glyphicon-globe"></span> Aethera</h1></div>
+				<div class="col-md-4 colm"></div>
+				
+			</div>
+				
+				<div class="row animated fadeInUpBig">
+			
+				<div class="col-md-1 colm"></div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="glyphicon glyphicon-time"></span> Date:</h4>
+					
+					<h5 id="Date"></h5>
+					
+				</div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="glyphicon glyphicon-volume-up"></span> Sound:</h4>
+					
+					<h5 id="Sound"></h5>
+					
+				</div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="icon">&#xf00d;</span> Visible Light:</h4>
+					
+					<h5 id="VisibleLight"></h5>
+					
+				</div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="icon">&#xf021;</span> Air Quality:</h4>
+					
+					<h5 id="AirQuality"></h5>
+					
+				</div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="icon">&#xf045;</span> Temperature (F):</h4>
+					
+					<h5 id="Temperature"></h5>
+					
+				</div>
+				
+				<div class="col-md-1 colm"></div>
+			
+			</div>
+				
+				<div class="row animated fadeInUpBig">
+				
+				<div class="col-md-1 colm"></div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="icon">&#xf021;</span> Humidity (%):</h4>
+					
+					<h5 id="Humidity"></h5>
+					
+				</div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="icon">&#xf046;</span> Heat Index (F):</h4>
+					
+					<h5 id="HeatIndex"></h5>
+					
+				</div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="icon">&#xf055;</span> UV Index:</h4>
+					
+					<h5 id="UVIndex"></h5>
+					
+				</div>
+				
+				<div class="col-md-2 colm">
+
+					<h4><span class="glyphicon glyphicon-dashboard"></span> Barometric Pressure (hPA):</h4>
+					
+					<h5 id="BarometricPressure"></h5>
+					
+				</div>
+				
+				<div class="col-md-2 colm">
+					
+					<h4><span class="icon">&#xf054;</span> Particulate Matter (PM2.5 per cubic ft):</h4>
+					
+					<h5 id="ParticulateMatter"></h5>
+					
+				</div>
+							
+				<div class="col-md-2 colm"></div>
+				
+			</div>
+				
+				<div class="row animated fadeInUpBig">
+
+				<div class="col-md-4 colm"></div>
+				
+				<div class="col-md-4 colm">
+					
+					<h4><span class="glyphicon glyphicon-align-justify"></span> Particulate Density:</h4>
+					
+					<h5 id="ParticulateDensity"></h5>
+					
+				</div>
+
+				<div class="col-md-4 colm"></div>
+				
+			</div>
+			</div>
+    </body>
+</html>
+
