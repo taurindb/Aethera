@@ -5,7 +5,7 @@ var fs = require('fs');
 var moment = require('moment');
 var sp = require("serialport")
 var SerialPort = sp.SerialPort;
-var serialport = new SerialPort("/dev/ttyACM0", {
+var serialport = new SerialPort("/dev/ttyACM0", {  //Arduino Device ID
     baudrate: 57600,
     parser: sp.parsers.readline("\n")
 });
