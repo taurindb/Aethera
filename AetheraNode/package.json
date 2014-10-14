@@ -4,6 +4,7 @@
   "devDependencies": {
   	"socket.io-client": "1.0.6",
     "serialport": "0.7.3",
+    "curl": "0.5.1",
     "moment": "2.8.1"
   }
 }
