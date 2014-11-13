@@ -23,7 +23,7 @@
 
 //digital light sensor      I2C
 
-#define SER_PUSH      Serial        //change to Serial1 for pushing to openWrt side through bridge
+#define SER_PUSH      Serial1        //change to Serial1 for pushing to openWrt side through bridge
 
 /* sample function */
 float iReadTemperature(void);
@@ -47,7 +47,10 @@ int sensorValue=0;
 DHT dht(pin_dht, DHTTYPE);
 
 /* sound sensor */
-float sound_raw_vol_max = 0.0f;  //mV
+int snd_raw_max = 0;
+uint32_t snd_sum_100ms = 0;
+uint16_t cntr_snd = 0;
+uint16_t snd_last_avg = 0;
 
 /* Air Quality */
 enum
@@ -69,7 +72,7 @@ int aq_result = AQ_WARMUP;
 /* Global varibles */
 boolean valid_dust = false;
 unsigned long push_starttime;
-unsigned long push_interval = 1000;  //ms
+unsigned long push_interval = 10000;  //ms
 
 
 
@@ -122,6 +125,7 @@ void setup() {
   /* other */
   push_starttime = millis();
   init_timer1(200);  //us, get the value based on Shannon's law, sound freq: 0~3400Hz
+  Serial.println(F("Done."));
 }
 
 
@@ -186,18 +190,18 @@ void push_data()
     switch (aq_result)
     {
       case AQ_WARMUP:
-        SER_PUSH.print(F("WarmUp")); break;
+        SER_PUSH.print(-1/*F("WarmUp")*/); break;
       case AQ_FRESH:
-        SER_PUSH.print(F("Fresh")); break;
+        SER_PUSH.print(0/*F("Fresh")*/); break;
       case AQ_LOW_POLLUTION:
-        SER_PUSH.print(F("LowPollution")); break;
+        SER_PUSH.print(1/*F("LowPollution")*/); break;
       case AQ_POLLUTION:
-        SER_PUSH.print(F("Pollution")); break;
+        SER_PUSH.print(2/*F("Pollution")*/); break;
       case AQ_HIGH_POLLUTION:
-        SER_PUSH.print(F("HighPollution")); break;
+        SER_PUSH.print(3/*F("HighPollution")*/); break;
     }
 
-    SER_PUSH.println();  //sum ~ 800ms / push
+    SER_PUSH.println(",");  //sum ~ 800ms / push
   }
 }
 
@@ -231,10 +235,27 @@ static int cntr_aq_sample = 0;
 ISR(TIMER1_OVF_vect)
 {
   int snd_raw = analogRead(pin_sound);
-  float snd_raw_mv = snd_raw * (4980.0 / 1023.0);
-  if (snd_raw_mv > sound_raw_vol_max) sound_raw_vol_max = snd_raw_mv;
+  if (snd_raw > snd_raw_max) snd_raw_max = snd_raw;
+  if((++cntr_snd)%5 == 0)
+  {
+    snd_sum_100ms += snd_raw_max;
+    snd_raw_max = 0;
+  }
+  if (cntr_snd >= 5000)
+  {
+    cntr_snd = 0;
+    uint16_t snd_this_avg = snd_sum_100ms/1000;
+    snd_sum_100ms = 0;
+    if(snd_last_avg == 0)
+      snd_last_avg = snd_this_avg;
+    else
+      snd_last_avg = (snd_last_avg + snd_this_avg) / 2;
+    //Serial.print(snd_this_avg);
+    //Serial.print(",");
+    //Serial.println(snd_last_avg);
+  }
 
-  if (air_quality_sensor_state == AQ_WORK && ++cntr_aq_sample == 10000)  //200us * 10000 = 2s
+  if (air_quality_sensor_state == AQ_WORK && ++cntr_aq_sample >= 10000)  //200us * 10000 = 2s
   {
     cntr_aq_sample = 0;
     //Serial.println("tm1 isr");
@@ -396,7 +417,7 @@ void init_timer1(long us)
 //*****************************************************************************
 float iReadTemperature(void) {
     float temper;
-    temper = dht.readTemperature(false); //true: get F, false: get oC
+    temper = dht.readTemperature(true); //true: get F, false: get oC
     return temper;
 }
 //*****************************************************************************
@@ -480,8 +501,6 @@ float iReadUVRawVol(void) {
 //*****************************************************************************
 int iReadSoundRawVol()
 {
-  int tmp = sound_raw_vol_max;
-  sound_raw_vol_max = 0;
-  return tmp;
+  return snd_last_avg * (int)(4980.0f / 1023.0f);
 }
 
